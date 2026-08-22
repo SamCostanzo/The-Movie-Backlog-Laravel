@@ -3,17 +3,34 @@ import AppLogoIcon from '@/components/app-logo-icon';
 import { home } from '@/routes';
 import type { AuthLayoutProps } from '@/types';
 
+type PageProps = {
+    name: string;
+    backdrops: string[];
+};
+
 export default function AuthSplitLayout({
     children,
     title,
     description,
 }: AuthLayoutProps) {
-    const { name } = usePage().props;
+    const { name, backdrops } = usePage<PageProps>().props;
+
+    const backdropPath =
+        backdrops && backdrops.length > 0
+            ? backdrops[Math.floor(Math.random() * backdrops.length)]
+            : null;
 
     return (
         <div className="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
             <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
-                <div className="absolute inset-0 bg-zinc-900" />
+                {backdropPath && (
+                    <img
+                        src={`https://image.tmdb.org/t/p/w1280${backdropPath}`}
+                        alt=""
+                        className="absolute inset-0 h-full w-full object-cover"
+                    />
+                )}
+                <div className="absolute inset-0 bg-black/15" />
                 <Link
                     href={home()}
                     className="relative z-20 flex items-center text-lg font-medium"

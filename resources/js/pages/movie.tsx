@@ -31,6 +31,7 @@ type MovieDetail = Movie & {
     backdrop_path: string | null;
     tagline: string | null;
     runtime: number | null;
+    overview: string;
     genres: Genre[];
     production_companies: Company[];
     credits: {
@@ -71,7 +72,9 @@ export default function MovieShow({
                         <h1 className="text-3xl font-bold">{movie.title}</h1>
 
                         {movie.tagline && (
-                            <p className="italic text-muted-foreground">{movie.tagline}</p>
+                            <p className="text-muted-foreground italic">
+                                {movie.tagline}
+                            </p>
                         )}
 
                         <p className="mt-2 text-sm text-muted-foreground">
@@ -83,7 +86,9 @@ export default function MovieShow({
 
                         {movie.genres.length > 0 && (
                             <p className="mt-2 text-sm">
-                                {movie.genres.map((genre) => genre.name).join(', ')}
+                                {movie.genres
+                                    .map((genre) => genre.name)
+                                    .join(', ')}
                             </p>
                         )}
 
@@ -135,7 +140,9 @@ export default function MovieShow({
                                     ) : (
                                         <div className="aspect-[2/3] rounded-md bg-muted" />
                                     )}
-                                    <p className="mt-1 text-sm font-medium">{member.name}</p>
+                                    <p className="mt-1 text-sm font-medium">
+                                        {member.name}
+                                    </p>
                                     <p className="text-xs text-muted-foreground">
                                         {member.character}
                                     </p>

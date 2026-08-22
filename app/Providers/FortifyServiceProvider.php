@@ -13,6 +13,8 @@ use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -51,29 +53,38 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::loginView(fn (Request $request) => Inertia::render('auth/login', [
             'canResetPassword' => Features::enabled(Features::resetPasswords()),
             'status' => $request->session()->get('status'),
+            'backdrops' => $this->authBackdrops(),
         ]));
 
         Fortify::resetPasswordView(fn (Request $request) => Inertia::render('auth/reset-password', [
             'email' => $request->email,
             'token' => $request->route('token'),
             'passwordRules' => Password::defaults()->toPasswordRulesString(),
+            'backdrops' => $this->authBackdrops(),
         ]));
 
         Fortify::requestPasswordResetLinkView(fn (Request $request) => Inertia::render('auth/forgot-password', [
             'status' => $request->session()->get('status'),
+            'backdrops' => $this->authBackdrops(),
         ]));
 
         Fortify::verifyEmailView(fn (Request $request) => Inertia::render('auth/verify-email', [
             'status' => $request->session()->get('status'),
+            'backdrops' => $this->authBackdrops(),
         ]));
 
         Fortify::registerView(fn () => Inertia::render('auth/register', [
             'passwordRules' => Password::defaults()->toPasswordRulesString(),
+            'backdrops' => $this->authBackdrops(),
         ]));
 
-        Fortify::twoFactorChallengeView(fn () => Inertia::render('auth/two-factor-challenge'));
+        Fortify::twoFactorChallengeView(fn () => Inertia::render('auth/two-factor-challenge', [
+            'backdrops' => $this->authBackdrops(),
+        ]));
 
-        Fortify::confirmPasswordView(fn () => Inertia::render('auth/confirm-password'));
+        Fortify::confirmPasswordView(fn () => Inertia::render('auth/confirm-password', [
+            'backdrops' => $this->authBackdrops(),
+        ]));
     }
 
     /**
@@ -95,6 +106,23 @@ class FortifyServiceProvider extends ServiceProvider
             return Limit::perMinute(10)->by(
                 ($request->input('credential.id') ?: $request->session()->getId()).'|'.$request->ip(),
             );
+        });
+    }
+
+    /**
+     * Using moive backdrops onto login page
+     */
+    private function authBackdrops(): array
+    {
+        return Cache::remember('auth-backdrops', now()->addHours(6), function () {
+            $response = Http::withToken(config('services.tmdb.key'))
+                ->get('https://api.themoviedb.org/3/movie/popular');
+
+            return collect($response->json()['results'] ?? [])
+                ->pluck('backdrop_path')
+                ->filter()
+                ->values()
+                ->all();
         });
     }
 }

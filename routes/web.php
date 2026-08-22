@@ -10,7 +10,7 @@ Route::get('/movies/search', [MovieSearchController::class, 'search'])->name('mo
 Route::get('/movies/{slug}', [MovieController::class, 'show'])->name('movies.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    // Route::inertia('dashboard', 'dashboard')->name('dashboard');
 });
 
 require __DIR__.'/settings.php';
