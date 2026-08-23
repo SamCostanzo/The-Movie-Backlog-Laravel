@@ -51,11 +51,14 @@ export default function MovieShow({
     return (
         <div>
             {movie.backdrop_path && (
-                <img
-                    src={`https://image.tmdb.org/t/p/w1280${movie.backdrop_path}`}
-                    alt=""
-                    className="w-full"
-                />
+                <div className="relative h-[420px] w-full overflow-hidden">
+                    <img
+                        src={`https://image.tmdb.org/t/p/w1280${movie.backdrop_path}`}
+                        alt=""
+                        className="h-full w-full object-cover"
+                    />
+                    <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background to-transparent" />
+                </div>
             )}
 
             <div className="mx-auto max-w-5xl px-4 py-8">

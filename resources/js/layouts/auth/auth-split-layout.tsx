@@ -1,4 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
+import { useEffect, useRef, useState } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { home } from '@/routes';
 import type { AuthLayoutProps } from '@/types';
@@ -15,22 +16,57 @@ export default function AuthSplitLayout({
 }: AuthLayoutProps) {
     const { name, backdrops } = usePage<PageProps>().props;
 
-    const backdropPath =
-        backdrops && backdrops.length > 0
-            ? backdrops[Math.floor(Math.random() * backdrops.length)]
-            : null;
+    const [images, setImages] = useState<[string | null, string | null]>([null, null]);
+    const [activeLayer, setActiveLayer] = useState<0 | 1>(0);
+    const activeLayerRef = useRef(activeLayer);
+    activeLayerRef.current = activeLayer;
+
+    useEffect(() => {
+        if (!backdrops || backdrops.length === 0) return;
+
+        const pickBackdrop = (avoid?: string | null) => {
+            if (backdrops.length === 1) return backdrops[0];
+            let choice: string;
+            do {
+                choice = backdrops[Math.floor(Math.random() * backdrops.length)];
+            } while (choice === avoid);
+            return choice;
+        };
+
+        setImages([pickBackdrop(), null]);
+
+        const intervalId = setInterval(() => {
+            const current = activeLayerRef.current;
+            const next = current === 0 ? 1 : 0;
+
+            setImages((prev) => {
+                const updated: [string | null, string | null] = [...prev];
+                updated[next] = pickBackdrop(prev[current]);
+                return updated;
+            });
+
+            setActiveLayer(next);
+        }, 10000);
+
+        return () => clearInterval(intervalId);
+    }, [backdrops]);
 
     return (
         <div className="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
             <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
-                {backdropPath && (
-                    <img
-                        src={`https://image.tmdb.org/t/p/w1280${backdropPath}`}
-                        alt=""
-                        className="absolute inset-0 h-full w-full object-cover"
-                    />
+                {images.map((path, index) =>
+                    path ? (
+                        <img
+                            key={index}
+                            src={`https://image.tmdb.org/t/p/w1280${path}`}
+                            alt=""
+                            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[2500ms] ease-in-out ${
+                                activeLayer === index ? 'opacity-100' : 'opacity-0'
+                            }`}
+                        />
+                    ) : null,
                 )}
-                <div className="absolute inset-0 bg-black/15" />
+                <div className="absolute inset-0 bg-black/50" />
                 <Link
                     href={home()}
                     className="relative z-20 flex items-center text-lg font-medium"
