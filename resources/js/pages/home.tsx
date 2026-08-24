@@ -21,7 +21,7 @@ export default function Home({ movies: initialMovies }: { movies: Movie[] }) {
     }, [query, initialMovies]);
 
     return (
-        <div className="mx-auto max-w-6xl px-6 py-10 sm:px-8">
+        <div className="mx-auto px-6 py-10 sm:px-8">
             <header className="flex flex-col gap-4 border-b-2 border-foreground pb-4 sm:flex-row sm:items-end sm:justify-between">
                 <h1 className="text-2xl font-semibold tracking-wide uppercase">The Movie Backlog</h1>
                 <input

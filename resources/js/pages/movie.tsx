@@ -39,15 +39,7 @@ type MovieDetail = Movie & {
     };
 };
 
-export default function MovieShow({
-    movie,
-    director,
-    trailer,
-}: {
-    movie: MovieDetail;
-    director: Director;
-    trailer: Trailer;
-}) {
+export default function MovieShow({ movie, director, trailer, }: { movie: MovieDetail; director: Director; trailer: Trailer; }) {
     return (
         <div>
             {movie.backdrop_path && (
@@ -57,11 +49,19 @@ export default function MovieShow({
                         alt=""
                         className="h-full w-full object-cover"
                     />
+
+                    {/* left edge fade */}
+                    <div className="absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-background to-transparent" />
+
+                    {/* right edge fade */}
+                    <div className="absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-background to-transparent" />
+
+                    {/* bottom fade into page content */}
                     <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background to-transparent" />
                 </div>
             )}
 
-            <div className="mx-auto max-w-5xl px-4 py-8">
+            <div className="relative z-1 mx-auto max-w-7xl px-4 py-10 mt-[-5em]">
                 <div className="flex gap-6">
                     {movie.poster_path && (
                         <img
